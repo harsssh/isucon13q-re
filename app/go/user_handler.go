@@ -428,7 +428,10 @@ func fillUserResponse(ctx context.Context, tx *sqlx.Tx, userModel UserModel) (Us
 			}
 		}
 	}
-	iconHash := sha256.Sum256(image)
+
+	iconHash := getOrInsertMap(&cache.IconHashCache, userModel.ID, func() any {
+		return sha256.Sum256(image)
+	})
 
 	user := User{
 		ID:          userModel.ID,
