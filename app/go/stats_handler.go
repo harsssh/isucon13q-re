@@ -91,7 +91,7 @@ func getUserStatisticsHandler(c echo.Context) error {
 WITH ranked AS (
 	SELECT
 		u.id,
-		ROW_NUMBER() OVER (ORDER BY COUNT(r.id) + IFNULL(SUM(lc.tip), 0) DESC) AS rnk
+		ROW_NUMBER() OVER (ORDER BY COUNT(r.id) + IFNULL(SUM(lc.tip), 0) DESC, u.name DESC) AS rnk
 	FROM users u
 	LEFT JOIN livestreams l ON l.user_id = u.id
 	LEFT JOIN reactions r ON r.livestream_id = l.id
