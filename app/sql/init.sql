@@ -13,3 +13,7 @@ ALTER TABLE `livestreams` auto_increment = 1;
 ALTER TABLE `users` auto_increment = 1;
 
 ALTER TABLE `livestream_tags` ADD INDEX livestream_id_idx(livestream_id);
+ALTER TABLE `themes` ADD INDEX user_id_idx(user_id);
+ALTER TABLE `ng_words` ADD INDEX user_id_livestream_id_idx(user_id, livestream_id);
+ALTER TABLE `reservation_slots` ADD INDEX start_at_idx(`start_at`);
+ALTER TABLE `icons` ADD INDEX user_id_idx(user_id);
