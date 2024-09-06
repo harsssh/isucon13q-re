@@ -104,11 +104,19 @@ func getIconHandler(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to get user: "+err.Error())
 	}
 
+	// キャッシュが存在したらそれを返す
+	icon := cache.GetIconCache(user.ID)
+	if icon != nil {
+		return c.Blob(http.StatusOK, "image/jpeg", icon)
+	}
+
 	var image []byte
 	if err := tx.GetContext(ctx, &image, "SELECT image FROM icons WHERE user_id = ?", user.ID); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return c.File(fallbackImage)
 		} else {
+			// 新規に取得した画像をキャッシュに保存
+			cache.SetIconCache(user.ID, image)
 			return echo.NewHTTPError(http.StatusInternalServerError, "failed to get user icon: "+err.Error())
 		}
 	}
@@ -148,6 +156,8 @@ func postIconHandler(c echo.Context) error {
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to insert new user icon: "+err.Error())
 	}
+	// キャッシュを更新する
+	cache.SetIconCache(userID, req.Image)
 
 	iconID, err := rs.LastInsertId()
 	if err != nil {
