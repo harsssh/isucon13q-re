@@ -53,3 +53,6 @@ innodb_doublewrite = 0
 innodb_flush_log_at_timeout = 3
 
 disable-log-bin
+
+innodb_status_output = ON
+innodb_status_output_locks = ON
