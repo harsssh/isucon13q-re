@@ -223,11 +223,14 @@ func searchLivestreamsHandler(c echo.Context) error {
 
 	livestreams := make([]Livestream, len(livestreamModels))
 	for i := range livestreamModels {
-		livestream, err := fillLivestreamResponse(ctx, tx, *livestreamModels[i])
-		if err != nil {
-			return echo.NewHTTPError(http.StatusInternalServerError, "failed to fill livestream: "+err.Error())
-		}
-		livestreams[i] = livestream
+		livestream := getOrInsertMap(&cache.LivestreamCache, livestreamModels[i].ID, func() interface{} {
+			livestream, err := fillLivestreamResponse(ctx, tx, *livestreamModels[i])
+			if err != nil {
+				//return echo.NewHTTPError(http.StatusInternalServerError, "failed to fill livestream: "+err.Error())
+			}
+			return livestream
+		})
+		livestreams[i] = livestream.(Livestream)
 	}
 
 	if err := tx.Commit(); err != nil {

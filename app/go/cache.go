@@ -3,10 +3,11 @@ package main
 import "sync"
 
 type Cache struct {
-	IconCache     sync.Map
-	IconHashCache sync.Map
-	TagCache      sync.Map
-	ThemeCache    sync.Map
+	IconCache       sync.Map
+	IconHashCache   sync.Map
+	TagCache        sync.Map
+	ThemeCache      sync.Map
+	LivestreamCache sync.Map
 }
 
 var cache Cache
