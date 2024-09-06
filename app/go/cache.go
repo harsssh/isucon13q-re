@@ -6,6 +6,7 @@ type Cache struct {
 	IconCache     sync.Map
 	IconHashCache sync.Map
 	TagCache      sync.Map
+	ThemeCache    sync.Map
 }
 
 var cache Cache

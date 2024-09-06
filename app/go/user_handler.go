@@ -238,6 +238,7 @@ func registerHandler(c echo.Context) error {
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to begin transaction: "+err.Error())
 	}
+	// themeのキャッシュは現状だとロールバックされない
 	defer tx.Rollback()
 
 	userModel := UserModel{
@@ -410,10 +411,16 @@ func verifyUserSession(c echo.Context) error {
 }
 
 func fillUserResponse(ctx context.Context, tx *sqlx.Tx, userModel UserModel) (User, error) {
-	themeModel := ThemeModel{}
-	if err := tx.GetContext(ctx, &themeModel, "SELECT * FROM themes WHERE user_id = ?", userModel.ID); err != nil {
-		return User{}, err
-	}
+	theme := getOrInsertMap(&cache.ThemeCache, userModel.ID, func() any {
+		themeModel := ThemeModel{}
+		if err := tx.GetContext(ctx, &themeModel, "SELECT * FROM themes WHERE user_id = ?", userModel.ID); err != nil {
+			//return Theme{}
+		}
+		return Theme{
+			ID:       themeModel.ID,
+			DarkMode: themeModel.DarkMode,
+		}
+	})
 
 	var image []byte
 	// キャッシュが存在したらそれを返す
@@ -439,11 +446,8 @@ func fillUserResponse(ctx context.Context, tx *sqlx.Tx, userModel UserModel) (Us
 		Name:        userModel.Name,
 		DisplayName: userModel.DisplayName,
 		Description: userModel.Description,
-		Theme: Theme{
-			ID:       themeModel.ID,
-			DarkMode: themeModel.DarkMode,
-		},
-		IconHash: fmt.Sprintf("%x", iconHash),
+		Theme:       theme.(Theme),
+		IconHash:    fmt.Sprintf("%x", iconHash),
 	}
 
 	return user, nil
