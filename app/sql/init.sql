@@ -12,7 +12,7 @@ ALTER TABLE `livecomments` auto_increment = 1;
 ALTER TABLE `livestreams` auto_increment = 1;
 ALTER TABLE `users` auto_increment = 1;
 
-ALTER TABLE `livestream` ADD INDEX user_id_idx(user_id);
+ALTER TABLE `livestreams` ADD INDEX user_id_idx(user_id);
 ALTER TABLE `livestream_tags` ADD INDEX livestream_id_idx(livestream_id);
 ALTER TABLE `livecomments` ADD INDEX livestream_id_created_at_idx(livestream_id, created_at desc);
 ALTER TABLE `themes` ADD INDEX user_id_idx(user_id);
