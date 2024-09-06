@@ -158,6 +158,7 @@ func postIconHandler(c echo.Context) error {
 	}
 	// キャッシュを更新する
 	cache.SetIconCache(userID, req.Image)
+	cache.IconHashCache.Delete(userID)
 
 	iconID, err := rs.LastInsertId()
 	if err != nil {
