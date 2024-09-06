@@ -393,7 +393,7 @@ func moderateHandler(c echo.Context) error {
 	}
 
 	// NGワードにヒットする過去の投稿も全削除する
-	condArr := make([]string, 0, len(ngwords))
+	condArr := make([]string, len(ngwords))
 	for i, ngword := range ngwords {
 		condArr[i] = "comment LIKE '%" + ngword.Word + "%'"
 	}
