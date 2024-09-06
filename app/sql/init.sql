@@ -16,6 +16,6 @@ ALTER TABLE `livestreams` ADD INDEX user_id_idx(user_id);
 ALTER TABLE `livestream_tags` ADD INDEX livestream_id_idx(livestream_id);
 ALTER TABLE `livecomments` ADD INDEX livestream_id_created_at_idx(livestream_id, created_at desc);
 ALTER TABLE `themes` ADD INDEX user_id_idx(user_id);
-ALTER TABLE `ng_words` ADD INDEX user_id_livestream_id_idx(user_id, livestream_id);
+ALTER TABLE `ng_words` ADD INDEX livestream_id_user_id_idx(livestream_id, user_id);
 ALTER TABLE `reservation_slots` ADD INDEX start_at_idx(`start_at`);
 ALTER TABLE `icons` ADD INDEX user_id_idx(user_id);
