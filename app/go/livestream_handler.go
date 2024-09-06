@@ -494,35 +494,38 @@ func fillLivestreamResponse(ctx context.Context, tx *sqlx.Tx, livestreamModel Li
 		return Livestream{}, err
 	}
 
-	var tagIDs []int64
-	if err := tx.SelectContext(ctx, &tagIDs, "SELECT tag_id FROM livestream_tags WHERE livestream_id = ?", livestreamModel.ID); err != nil {
-		return Livestream{}, err
-	}
-
-	var tags []Tag
-	if len(tagIDs) == 0 {
-		tags = []Tag{}
-	} else {
-		tags = make([]Tag, len(tagIDs))
-		var tagModels []TagModel
-		query, args, _ := sqlx.In("SELECT * FROM tags WHERE id IN (?)", tagIDs)
-		if err := tx.SelectContext(ctx, &tagModels, query, args...); err != nil {
-			return Livestream{}, err
+	tags := getOrInsertMap(&cache.TagCache, livestreamModel.ID, func() interface{} {
+		var tagIDs []int64
+		if err := tx.SelectContext(ctx, &tagIDs, "SELECT tag_id FROM livestream_tags WHERE livestream_id = ?", livestreamModel.ID); err != nil {
+			//return Livestream{}, err
 		}
 
-		for i := range tagModels {
-			tags[i] = Tag{
-				ID:   tagModels[i].ID,
-				Name: tagModels[i].Name,
+		var tags []Tag
+		if len(tagIDs) == 0 {
+			tags = []Tag{}
+		} else {
+			tags = make([]Tag, len(tagIDs))
+			var tagModels []TagModel
+			query, args, _ := sqlx.In("SELECT * FROM tags WHERE id IN (?)", tagIDs)
+			if err := tx.SelectContext(ctx, &tagModels, query, args...); err != nil {
+				//return Livestream{}, err
+			}
+
+			for i := range tagModels {
+				tags[i] = Tag{
+					ID:   tagModels[i].ID,
+					Name: tagModels[i].Name,
+				}
 			}
 		}
-	}
+		return tags
+	})
 
 	livestream := Livestream{
 		ID:           livestreamModel.ID,
 		Owner:        owner,
 		Title:        livestreamModel.Title,
-		Tags:         tags,
+		Tags:         tags.([]Tag),
 		Description:  livestreamModel.Description,
 		PlaylistUrl:  livestreamModel.PlaylistUrl,
 		ThumbnailUrl: livestreamModel.ThumbnailUrl,

@@ -5,6 +5,7 @@ import "sync"
 type Cache struct {
 	IconCache     sync.Map
 	IconHashCache sync.Map
+	TagCache      sync.Map
 }
 
 var cache Cache
