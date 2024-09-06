@@ -417,7 +417,7 @@ func fillUserResponse(ctx context.Context, tx *sqlx.Tx, userModel UserModel) (Us
 	var image []byte
 	// キャッシュが存在したらそれを返す
 	image = cache.GetIconCache(userModel.ID)
-	if image != nil {
+	if image == nil {
 		if err := tx.GetContext(ctx, &image, "SELECT image FROM icons WHERE user_id = ?", userModel.ID); err != nil {
 			if !errors.Is(err, sql.ErrNoRows) {
 				return User{}, err
