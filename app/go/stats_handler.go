@@ -238,7 +238,8 @@ func getLivestreamStatisticsHandler(c echo.Context) error {
 WITH ranked AS (
     SELECT
         l.id,
-        ROW_NUMBER() OVER (ORDER BY COUNT(r.id) + IFNULL(SUM(lc.tip), 0), l.id DESC) AS rnk
+        COUNT(r.id) + IFNULL(SUM(lc.tip), 0) AS score,
+        ROW_NUMBER() OVER (ORDER BY COUNT(r.id) + IFNULL(SUM(lc.tip), 0) DESC, l.id DESC) AS rnk
     FROM livestreams l
     LEFT JOIN reactions r ON l.id = r.livestream_id
     LEFT JOIN livecomments lc ON l.id = lc.livestream_id
